@@ -1,0 +1,53 @@
+public class Solution {
+    string originalStr = string.Empty;
+    public string ReorganizeString(string S) {
+        var dic = new Dictionary<char,int>();
+        originalStr =S;
+        foreach(var character in S.ToArray()){
+            if (dic.ContainsKey(character)){
+                dic[character] +=1;
+            }else{
+                dic.Add(character,1);
+            }
+        } 
+        List<string> result = new List<string>();
+        
+        Helper(result,  dic,  "");
+        if (result.Any())
+            return result.First();
+        else 
+            return string.Empty;
+    }
+    
+    private void Helper(List<string> result,  Dictionary<char,int> left, string current){
+        if (current.Length == originalStr.Length) {
+            result.Add(current);
+            return;
+        }
+        var keys= left.Select(m=>m.Key).ToArray(); 
+        for(var i =0; i < keys.Length;i++){ 
+            if (current.Length >0 && current[0] == keys[i] && current[current.Length-1] == keys[i])
+                continue; 
+            var temp = current;
+            if (current.Length >0){
+                if (current[0] == keys[i])
+                    current+=keys[i].ToString();
+                else
+                    current = keys[i].ToString() + current;
+            }else{
+                current +=keys[i].ToString();
+            }  
+            left[keys[i]] -=1;
+            if (left[keys[i]]==0){
+                left.Remove(keys[i]);
+            } 
+            Helper(result, new Dictionary<char,int>(left), current); 
+            if (left.ContainsKey(keys[i])){
+                left[keys[i]] +=1;
+            }else{
+                left.Add(keys[i],1);
+            } 
+            current = temp;
+        }
+    }
+}
